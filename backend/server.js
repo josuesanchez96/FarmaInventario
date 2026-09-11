@@ -14,12 +14,12 @@ app.use(express.json());
 
 // Request logging middleware for clean debugging
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} (original: ${req.originalUrl})`);
   next();
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/health'], (req, res) => {
   res.status(200).json({
     status: 'online',
     system: 'Sistema de Inventario de Medicamentos API',
@@ -28,17 +28,14 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes (supports both /api/ prefix and direct serverless function routes)
-app.use('/api/auth', authRoutes);
-app.use('/auth', authRoutes);
-app.use('/api/medicamentos', medicamentoRoutes);
-app.use('/medicamentos', medicamentoRoutes);
-
+app.use(['/api/auth', '/auth'], authRoutes);
+app.use(['/api/medicamentos', '/medicamentos'], medicamentoRoutes);
 
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Ruta no encontrada: ${req.method} ${req.url}`
+    message: `Ruta API no encontrada: ${req.method} ${req.url}`
   });
 });
 
@@ -62,4 +59,5 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
