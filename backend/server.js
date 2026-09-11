@@ -48,10 +48,15 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🚀 Servidor backend ejecutándose en el puerto ${PORT}`);
-  console.log(`🔗 API Base: http://localhost:${PORT}/api`);
-  console.log(`🔑 Credenciales por defecto: admin / admin123`);
-  console.log(`====================================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🚀 Servidor backend ejecutándose en el puerto ${PORT}`);
+    console.log(`🔗 API Base: http://localhost:${PORT}/api`);
+    console.log(`🔑 Credenciales por defecto: admin / admin123`);
+    console.log(`====================================================`);
+  });
+}
+
+module.exports = app;
+
