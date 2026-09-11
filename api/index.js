@@ -9,13 +9,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Normalization middleware for Vercel Serverless Function rewrites
+// Robust URL Normalization for Vercel Serverless Rewrites
 app.use((req, res, next) => {
-  // Normalize /api/auth/login -> /auth/login if /api prefix is present
-  if (req.url.startsWith('/api/')) {
-    req.url = req.url.replace('/api', '');
-  } else if (req.url === '/api' || req.url === '/api/') {
-    req.url = '/';
+  const rawUrl = req.originalUrl || req.url || '';
+  
+  if (rawUrl.includes('/auth')) {
+    req.url = rawUrl.substring(rawUrl.indexOf('/auth'));
+  } else if (rawUrl.includes('/medicamentos')) {
+    req.url = rawUrl.substring(rawUrl.indexOf('/medicamentos'));
+  } else if (rawUrl.includes('/health')) {
+    req.url = '/health';
   }
   next();
 });
@@ -33,7 +36,7 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/medicamentos', medicamentoRoutes);
 
-// 404 Handler for API
+// Catch-all 404 Handler for API
 app.use((req, res) => {
   res.status(404).json({
     success: false,
