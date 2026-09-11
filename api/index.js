@@ -9,8 +9,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Normalization middleware for Vercel Serverless Function rewrites
+app.use((req, res, next) => {
+  // Normalize /api/auth/login -> /auth/login if /api prefix is present
+  if (req.url.startsWith('/api/')) {
+    req.url = req.url.replace('/api', '');
+  } else if (req.url === '/api' || req.url === '/api/') {
+    req.url = '/';
+  }
+  next();
+});
+
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'online',
     system: 'Sistema de Inventario de Medicamentos API',
@@ -19,15 +30,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/medicamentos', medicamentoRoutes);
-
-// Fallbacks without /api prefix
 app.use('/auth', authRoutes);
 app.use('/medicamentos', medicamentoRoutes);
 
-// Catch all for unmatched API routes
-app.use('*', (req, res) => {
+// 404 Handler for API
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: `Ruta API no encontrada: ${req.method} ${req.url}`
