@@ -27,9 +27,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Routes
+// API Routes (supports both /api/ prefix and direct serverless function routes)
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/api/medicamentos', medicamentoRoutes);
+app.use('/medicamentos', medicamentoRoutes);
+
 
 // 404 Handler
 app.use((req, res) => {
